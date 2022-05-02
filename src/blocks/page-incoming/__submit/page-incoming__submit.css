@@ -14,6 +14,12 @@
     cursor: pointer;
 }
 
-.register__submit:hover {
+.page-incoming__submit:hover {
     opacity: 0.6;
+}
+
+@media screen and (max-width: 960px) {
+    .page-incoming__submit {
+        width: 260px;
+    }
 }

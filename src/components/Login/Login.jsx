@@ -3,11 +3,6 @@ import React, { useState } from "react";
 function Login(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [inputs, setInputs] = useState({
-  //     username: '',
-  //     password: '',
-  // });
-  const [message, setMessage] = useState("123");
 
   function handleInputEmailChange(e) {
     setEmail(e.target.value);
@@ -16,49 +11,38 @@ function Login(props) {
   function handleInputPassChange(e) {
     setPassword(e.target.value);
   }
-  // const handleChange = (e) => {
-  //     const {name, value} = e.target;
-  //     setInputs((prev) => ({
-  //         ...prev,
-  //         [name]: value,
-  //     }));
-  // }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email || !password) {
       return;
     }
-
-    //На видео 1.21
-    props.handleLogin(email, password).catch(setMessage);
+    props.handleLogin(email, password).catch(console.log);
   };
 
   return (
-    <section className="page-incoming register">
-      <form
-        onSubmit={handleSubmit}
-        className="page-incoming__form register__form"
-      >
-        <h2 className="page-incoming__title register__title">Вход</h2>
-        <fieldset className="page-incoming__inputs-container register__inputs-container">
+    <section className="page-incoming">
+      <form onSubmit={handleSubmit} className="page-incoming__form">
+        <h2 className="page-incoming__title">Вход</h2>
+        <fieldset className="page-incoming__inputs-container">
           <input
+          type="email"
             value={email}
             onChange={handleInputEmailChange}
-            className="page-incoming__input page-incoming__input_type_email register__input register__input_type_email"
+            className="page-incoming__input page-incoming__input_type_email"
             placeholder="Email"
+            required
           ></input>
           <input
+            type="password"
             value={password}
             onChange={handleInputPassChange}
-            className="page-incoming__input page-incoming__input_type_password register__input register__input_type_password"
+            className="page-incoming__input page-incoming__input_type_password"
             placeholder="Пароль"
+            required
           ></input>
         </fieldset>
-        <button
-          type="submit"
-          className="page-incoming__submit register__submit"
-        >
+        <button type="submit" className="page-incoming__submit">
           Войти
         </button>
       </form>

@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Route, Switch, Redirect, useHistory } from "react-router-dom";
+import {
+  Route,
+  Switch,
+  Redirect,
+  useHistory,
+  useLocation,
+} from "react-router-dom";
 import Header from "./Header/Header";
 import Main from "./Main/Main";
 import Footer from "./Footer/Footer";
@@ -23,12 +29,15 @@ function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [infoTooltip, setInfoTooltip] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState(currentUserDefault);
   const [cards, setCards] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [userData, setUserData] = useState(null);
   const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
     api
@@ -57,9 +66,18 @@ function App() {
       history.push("/");
       return;
     }
-
     history.push("/sign-up");
   }, [loggedIn]);
+
+  useEffect(() => {
+    const closeByEscape = (e) => {
+      if (e.key === "Escape") {
+        closeAllPopups();
+      }
+    };
+    document.addEventListener("keydown", closeByEscape);
+    return () => document.removeEventListener("keydown", closeByEscape);
+  }, []);
 
   const handleLogin = (email, password) => {
     return Auth.authorize(email, password).then((data) => {
@@ -72,9 +90,16 @@ function App() {
   };
 
   const handleRegister = (password, email) => {
-    return Auth.register(password, email).then((res) => {
-      history.push("/sign-in");
-    });
+    return Auth.register(password, email)
+      .then(() => {
+        history.push("/sign-in");
+        setSuccess(true);
+        handleinfoTooltipClick();
+      })
+      .catch(() => {
+        setSuccess(false);
+        handleinfoTooltipClick();
+      });
   };
 
   const tokenCheck = () => {
@@ -83,10 +108,7 @@ function App() {
 
       Auth.getContent(jwt).then((res) => {
         if (res) {
-          setUserData({
-            username: res.username,
-            email: res.email,
-          });
+          setUserData(res.data.email);
           setLoggedIn(true);
         }
       });
@@ -96,8 +118,13 @@ function App() {
   const handleSignOut = () => {
     localStorage.removeItem("token");
     setLoggedIn(false);
+    setUserData(null);
   };
-
+  const handleText = () => {
+    if (location.pathname === "/sign-in") return history.push("/sign-up");
+    else if (location.pathname === "/sign-up") return history.push("/sign-in");
+    return handleSignOut();
+  };
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
   };
@@ -110,22 +137,17 @@ function App() {
     setIsAddPlacePopupOpen(true);
   };
 
+  const handleinfoTooltipClick = () => {
+    setInfoTooltip(true);
+  };
+
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
+    setInfoTooltip(false);
     setSelectedCard({});
   };
-
-  useEffect(() => {
-    const closeByEscape = (e) => {
-      if (e.key === "Escape") {
-        closeAllPopups();
-      }
-    };
-    document.addEventListener("keydown", closeByEscape);
-    return () => document.removeEventListener("keydown", closeByEscape);
-  }, []);
 
   const handleCardClick = (link, name) => {
     setSelectedCard({ active: true, link: link, name: name });
@@ -185,18 +207,7 @@ function App() {
 
   return (
     <div className="page">
-      <>
-        {loggedIn ? (
-          <Header
-            incoming="Выйти"
-            email={"email@email.ru"}
-            handleSignOut={handleSignOut}
-          />
-        ) : (
-          <Header incoming="Регистрация" email="" />
-        )}
-      </>
-      {/* <Header /> */}
+      <Header email={userData} handleText={handleText} />
       <CurrentUserContext.Provider value={currentUser}>
         <Switch>
           <ProtectedRoute exact path="/" loggedIn={loggedIn}>
@@ -240,6 +251,11 @@ function App() {
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar}
         />
+        <InfoTooltip
+          isOpen={infoTooltip}
+          onClose={closeAllPopups}
+          isSuccess={success}
+        ></InfoTooltip>
       </CurrentUserContext.Provider>
     </div>
   );

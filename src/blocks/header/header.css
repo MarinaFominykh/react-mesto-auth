@@ -14,5 +14,6 @@
         margin: auto;
         min-height: 56px;
         box-sizing: border-box;
+        align-items: center;
     }
 }
