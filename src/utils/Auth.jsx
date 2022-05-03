@@ -11,37 +11,8 @@ export const register = (password, email) => {
       password,
       email,
     }),
-  })
-    // .then((res) => res.json())
-    // .then((data) => {
-    //   localStorage.setItem("token", data.token);
-    // });
-    .then(checkResponse)
+  }).then(checkResponse);
 };
-
-// export const register = (password, email) => {
-//   return fetch(`${BASE_URL}/signup`, {
-//     method: 'POST',
-//     headers: {
-//       'Accept': 'application/json',
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({password, email})
-//   })
-//   .then((response) => {
-//     try {
-//       if (response.status === 200){
-//         return response.json();
-//       }
-//     } catch(e){
-//       return (e)
-//     }
-//   })
-//   .then((res) => {
-//     return res;
-//   })
-//   .catch((err) => console.log(err));
-// }; 
 
 export const authorize = (email, password) => {
   return fetch(`${BASE_URL}/signin`, {

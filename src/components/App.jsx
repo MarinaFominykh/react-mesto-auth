@@ -57,17 +57,11 @@ function App() {
       .catch(console.log);
   }, []);
 
-  useEffect(() => {
-    tokenCheck();
-  }, []);
 
   useEffect(() => {
-    if (loggedIn) {
-      history.push("/");
-      return;
-    }
-    history.push("/sign-up");
+    checkToken();
   }, [loggedIn]);
+
 
   useEffect(() => {
     const closeByEscape = (e) => {
@@ -102,7 +96,7 @@ function App() {
       });
   };
 
-  const tokenCheck = () => {
+  const checkToken = () => {
     if (localStorage.getItem("token")) {
       let jwt = localStorage.getItem("token");
 
@@ -110,6 +104,7 @@ function App() {
         if (res) {
           setUserData(res.data.email);
           setLoggedIn(true);
+          history.push("/");
         }
       });
     }
@@ -120,11 +115,7 @@ function App() {
     setLoggedIn(false);
     setUserData(null);
   };
-  const handleText = () => {
-    if (location.pathname === "/sign-in") return history.push("/sign-up");
-    else if (location.pathname === "/sign-up") return history.push("/sign-in");
-    return handleSignOut();
-  };
+ 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
   };
@@ -207,7 +198,7 @@ function App() {
 
   return (
     <div className="page">
-      <Header email={userData} handleText={handleText} />
+      <Header email={userData} handleSignOut={handleSignOut} />
       <CurrentUserContext.Provider value={currentUser}>
         <Switch>
           <ProtectedRoute exact path="/" loggedIn={loggedIn}>
@@ -222,7 +213,7 @@ function App() {
             ></Main>
           </ProtectedRoute>
           <Route path="/sign-in">
-            <Login handleLogin={handleLogin} tokenCheck={tokenCheck} />
+            <Login handleLogin={handleLogin} />
           </Route>
           <Route path="/sign-up">
             <Register handleRegister={handleRegister} />

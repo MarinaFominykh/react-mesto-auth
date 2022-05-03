@@ -7,6 +7,7 @@
     color: #A9A9A9;
     transition: .5s;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .header__incoming-text:hover {

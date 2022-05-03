@@ -1,22 +1,29 @@
 import logo from "../../images/logo.svg";
-import { useLocation } from "react-router-dom";
+import { Switch, Route, Link } from "react-router-dom";
 
-function Header({ email, handleText }) {
-  const location = useLocation();
-  const getText = () => {
-    if (location.pathname === "/sign-in") return "Регистрация";
-    else if (location.pathname === "/sign-up") return "Войти";
-    else return "Выйти";
-  };
-
+function Header({ email, handleSignOut }) {
   return (
     <header className="header">
       <img src={logo} className="header__logo" alt="Лого" />
       <div className="header__incoming">
         <p className="header__incoming-email">{email}</p>
-        <p onClick={handleText} className="header__incoming-text">
-          {getText()}
-        </p>
+        <Switch>
+          <Route path="/sign-in">
+            <Link to="sign-up" style={{ textDecoration: "none" }}>
+              <p className="header__incoming-text">Регистрация</p>
+            </Link>
+          </Route>
+          <Route path="/sign-up">
+            <Link to="sign-in" style={{ textDecoration: "none" }}>
+              <p className="header__incoming-text">Войти</p>
+            </Link>
+          </Route>
+          <Route path="/">
+            <p onClick={handleSignOut} className="header__incoming-text">
+              Выйти
+            </p>
+          </Route>
+        </Switch>
       </div>
     </header>
   );
